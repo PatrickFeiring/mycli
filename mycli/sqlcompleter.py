@@ -239,11 +239,13 @@ class SQLCompleter(Completer):
             casing = 'lower' if last and last[-1].islower() else 'upper'
 
         def apply_case(kw):
+            if casing is None:
+                return kw
             if casing == 'upper':
                 return kw.upper()
             return kw.lower()
 
-        return (Completion(z if casing is None else apply_case(z), -len(text))
+        return (Completion(apply_case(z), -len(text))
                 for x, y, z in sorted(completions))
 
     def get_completions(self, document, complete_event, smart_completion=None):
