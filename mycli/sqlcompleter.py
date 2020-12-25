@@ -227,13 +227,13 @@ class SQLCompleter(Completer):
             for item in sorted(collection):
                 r = pat.search(item.lower())
                 if r:
-                    completions.append((len(r.group()), r.start(), item))
+                    completions.append((item, (len(r.group()), r.start(), item)))
         else:
             match_end_limit = len(text) if start_only else None
             for item in sorted(collection):
                 match_point = item.lower().find(text, 0, match_end_limit)
                 if match_point >= 0:
-                    completions.append((len(text), match_point, item))
+                    completions.append((item, (len(text), match_point, item)))
 
         if casing == 'auto':
             casing = 'lower' if last and last[-1].islower() else 'upper'
@@ -245,8 +245,8 @@ class SQLCompleter(Completer):
                 return kw.upper()
             return kw.lower()
 
-        return (Completion(apply_case(z), -len(text))
-                for x, y, z in sorted(completions))
+        return (Completion(apply_case(item), -len(text))
+                for item, _ in sorted(completions, key=lambda x: x[1]))
 
     def get_completions(self, document, complete_event, smart_completion=None):
         word_before_cursor = document.get_word_before_cursor(WORD=True)
