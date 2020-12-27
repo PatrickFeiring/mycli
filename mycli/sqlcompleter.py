@@ -225,15 +225,19 @@ class SQLCompleter(Completer):
             regex = '.*?'.join(map(escape, text))
             pat = compile('(%s)' % regex)
             for item in sorted(collection):
-                r = pat.search(item.lower())
+                item_unescaped = item.strip('`')
+                r = pat.search(item_unescaped.lower())
                 if r:
-                    completions.append((item, (len(r.group()), r.start(), item)))
+                    completions.append(
+                        (item, (len(r.group()), r.start(), item_unescaped)))
         else:
             match_end_limit = len(text) if start_only else None
             for item in sorted(collection):
-                match_point = item.lower().find(text, 0, match_end_limit)
+                item_unescaped = item.strip('`')
+                match_point = item_unescaped.lower().find(text, 0, match_end_limit)
                 if match_point >= 0:
-                    completions.append((item, (len(text), match_point, item)))
+                    completions.append(
+                        (item, (len(text), match_point, item_unescaped)))
 
         if casing == 'auto':
             casing = 'lower' if last and last[-1].islower() else 'upper'
